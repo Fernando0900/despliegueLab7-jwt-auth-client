@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import UserService from "../services/user.service";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
+  const [serverData, setServerData] = useState("");
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -12,6 +14,15 @@ export default function Profile() {
       navigate("/login");
     } else {
       setUser(storedUser);
+
+      // ✅ Llamada al backend protegida
+      UserService.getUserBoard()
+        .then(res => {
+          setServerData(res.data); // Aquí puedes renderizar si backend retorna info
+        })
+        .catch(err => {
+          console.error("Error al obtener datos del backend", err);
+        });
     }
   }, [navigate]);
 
@@ -50,6 +61,12 @@ export default function Profile() {
           <p><strong>Usuario:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Roles:</strong> {user.roles?.join(", ")}</p>
+
+          {serverData && (
+            <div style={{ marginTop: "1rem", color: "#1e40af" }}>
+              <strong>📡 Datos del servidor:</strong> {serverData}
+            </div>
+          )}
 
           <button
             onClick={handleLogout}
