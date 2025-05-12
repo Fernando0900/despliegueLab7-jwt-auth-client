@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 export default function Home() {
   return (
-    <div>
-      <h1>🏠 Página de inicio</h1>
+    <div style={{ padding: "2rem" }}>
+      <h2>🏠 Página de inicio</h2>
     </div>
   );
 }

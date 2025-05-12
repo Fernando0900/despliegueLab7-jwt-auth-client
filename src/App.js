@@ -4,8 +4,10 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import Profile from './pages/Profile';
+import './App.css';
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Navbar />
@@ -13,9 +15,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;
