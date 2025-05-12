@@ -1,61 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
+import "./Login.css";
 
 export default function Login() {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ username: "", password: "" });
-  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setMessage("");
-    setLoading(true);
-
-    AuthService.login(form.username, form.password)
-      .then(() => {
-        navigate("/profile");
-        window.location.reload(); // 🔄 recarga para asegurar lectura del usuario
-      })
-      .catch((error) => {
-        let errMsg = "Error al iniciar sesión.";
-        if (error.response && error.response.data && error.response.data.message) {
-          errMsg = error.response.data.message;
-        }
-        setMessage(`❌ ${errMsg}`);
-        setLoading(false);
-      });
+    try {
+      const res = await AuthService.login(username, password);
+      localStorage.setItem("user", JSON.stringify(res.data));
+      navigate("/profile");
+    } catch (err) {
+      setMessage("❌ Error al iniciar sesión.");
+    }
   };
 
   return (
-    <div className="login-form">
-      <h2>🔐 Iniciar sesión</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="username"
-          placeholder="Usuario"
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Contraseña"
-          onChange={handleChange}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Cargando..." : "Entrar"}
-        </button>
+    <div className="form-container">
+      <form onSubmit={handleLogin} className="form">
+        <h2>🔐 Iniciar sesión</h2>
+        <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Usuario" required />
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Contraseña" required />
+        <button type="submit">Entrar</button>
+        {message && <p className="error">{message}</p>}
       </form>
-      {message && (
-        <p style={{ marginTop: "1rem", color: "red", fontWeight: "bold" }}>{message}</p>
-      )}
     </div>
   );
 }

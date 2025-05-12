@@ -3,37 +3,34 @@ import { useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
 
 export default function Register() {
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-
-    AuthService.register(form.username, form.email, form.password, ["user"])
-      .then(() => {
-        setMessage("✅ Registro exitoso. Redirigiendo al inicio de sesión...");
-        setTimeout(() => navigate("/login"), 2000);
-      })
-      .catch(() => {
-        setMessage("❌ Error al registrar. Intenta de nuevo.");
-      });
+    setMessage("");
+    try {
+      await AuthService.register(username, email, password, ["user"]);
+      setMessage("✅ Registro exitoso. Redirigiendo...");
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (err) {
+      setMessage("❌ Error al registrar usuario.");
+    }
   };
 
   return (
-    <div className="register-form">
-      <h2>📝 Registro</h2>
-      <form onSubmit={handleSubmit}>
-        <input name="username" placeholder="Usuario" onChange={handleChange} required />
-        <input name="email" type="email" placeholder="Correo" onChange={handleChange} required />
-        <input name="password" type="password" placeholder="Contraseña" onChange={handleChange} required />
+    <div className="form-container">
+      <form onSubmit={handleRegister} className="form">
+        <h2>📝 Registro</h2>
+        <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Usuario" required />
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Correo" required />
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Contraseña" required />
         <button type="submit">Registrarse</button>
+        {message && <p className="message">{message}</p>}
       </form>
-      {message && <p style={{ color: message.includes("✅") ? "green" : "red" }}>{message}</p>}
     </div>
   );
 }
